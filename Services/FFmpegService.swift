@@ -72,6 +72,7 @@ final class FFmpegService: ObservableObject, @unchecked Sendable {
         process.executableURL = URL(fileURLWithPath: ffmpegPath)
         process.arguments = [
             "-i", audioFile.url.path,
+            "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
             "-codec:a", "libmp3lame",
             "-b:a", "\(bitrate)k",
             "-y",
@@ -195,6 +196,28 @@ final class FFmpegService: ObservableObject, @unchecked Sendable {
         for process in processes {
             process.terminate()
         }
+    }
+
+    private func findSystemFFmpeg() -> String? {
+        let candidates = [
+            "/opt/homebrew/bin/ffmpeg",
+            "/usr/local/bin/ffmpeg",
+            "/opt/homebrew/opt/ffmpeg/bin/ffmpeg"
+        ]
+        for path in candidates {
+            if FileManager.default.isExecutableFile(atPath: path) {
+                return path
+            }
+        }
+        // Try PATH
+        let env = ProcessInfo.processInfo.environment["PATH"] ?? "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+        for dir in env.components(separatedBy: ":") {
+            let path = (dir as NSString).appendingPathComponent("ffmpeg")
+            if FileManager.default.isExecutableFile(atPath: path) {
+                return path
+            }
+        }
+        return nil
     }
 
     private func parseProgress(from data: Data, fileId: UUID) {
