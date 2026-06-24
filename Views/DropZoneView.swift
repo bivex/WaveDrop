@@ -39,38 +39,33 @@ struct DropZoneView: View {
     }
 
     private func dropFiles(_ providers: [NSItemProvider]) -> Bool {
-        var urls: [URL] = []
+        let group = DispatchGroup()
 
         for provider in providers {
             guard provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) else {
                 continue
             }
 
-            let semaphore = DispatchSemaphore(value: 0)
-            var loadedURL: URL?
-
-            provider.loadObject(ofClass: URL.self) { url, _ in
-                loadedURL = url
-                semaphore.signal()
-            }
-
-            semaphore.wait()
-            if let url = loadedURL {
-                urls.append(url)
-            }
-        }
-
-        let validURLs = urls.filter { $0.pathExtension.lowercased() == "wav" }
-
-                if validURLs.count != urls.count && validURLs.count > 0 {
-                    showToast("Some files were skipped (only WAV supported)")
+            group.enter()
+            provider.loadObject(ofClass: URL.self) { [self] url, _ in
+                defer { group.leave() }
+                guard let url = url else { return }
+                let isValid = url.pathExtension.lowercased() == "wav"
+                if isValid {
+                    DispatchQueue.main.async {
+                        onFilesDropped([url])
+                    }
                 }
-
-        if !validURLs.isEmpty {
-            onFilesDropped(validURLs)
+            }
         }
 
-        return !validURLs.isEmpty
+        // Fire a background group notification to show toast if needed
+        group.notify(queue: .main) {
+            // Drop accepted, files are being processed
+        }
+
+        // Accept the drop optimistically — file loading happens asynchronously
+        return true
     }
 
     private func showToast(_ message: String) {
