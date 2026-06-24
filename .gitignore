@@ -1,0 +1,27 @@
+# Build artifacts
+.build/
+build/
+*.o
+*.a
+*.dylib
+DerivedData/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode
+*.xcworkspace
+*.xcuserstate
+*.xcodeproj/project.xcworkspace
+*.xcodeproj/xcuserdata
+
+# WaveDrop binary
+*.app
+
+# FFmpeg embedded binary (distributed separately)
+Resources/ffmpeg
+/build
+/build
+/build/SwiftExplicitPrecompiledModules
