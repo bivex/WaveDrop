@@ -33,16 +33,29 @@ final class FFmpegService: ObservableObject, @unchecked Sendable {
         }
     }
 
+    private final class LogBox: @unchecked Sendable {
+        let log: @Sendable (String) -> Void
+        init(_ log: @escaping @Sendable (String) -> Void) { self.log = log }
+        func call(_ text: String) { log(text) }
+    }
+
     func convertFile(
         _ audioFile: AudioFile,
         bitrate: Int,
         outputFolder: URL?,
+        log: @escaping @Sendable (String) -> Void = { _ in },
         completion: @escaping (Result<URL, Error>) -> Void
     ) -> UUID? {
         let process = Process()
         let fileId = audioFile.id
 
-        guard let ffmpegPath = Bundle.main.path(forResource: "ffmpeg", ofType: nil) else {
+        let ffmpegPath: String
+        if let bundled = Bundle.main.path(forResource: "ffmpeg", ofType: nil) {
+            ffmpegPath = bundled
+        } else if let system = findSystemFFmpeg() {
+            ffmpegPath = system
+        } else {
+            log("❌ FFmpeg not found (bundled or system)")
             completion(.failure(FFmpegError.ffmpegNotFound))
             return nil
         }
@@ -65,6 +78,15 @@ final class FFmpegService: ObservableObject, @unchecked Sendable {
             outputURL.path
         ]
 
+        let fileName = audioFile.name
+        let sourcePath = audioFile.url.path
+        let outputPath = outputURL.path
+        let commandStr = process.arguments!.joined(separator: " ")
+        log("🚀 Converting: \(fileName)")
+        log("   Source: \(sourcePath)")
+        log("   Output: \(outputPath)")
+        log("   Command: ffmpeg \(commandStr)")
+
         let pipe = Pipe()
         process.standardOutput = pipe
         process.standardError = pipe
@@ -72,6 +94,7 @@ final class FFmpegService: ObservableObject, @unchecked Sendable {
         let outputHandle = pipe.fileHandleForReading
         let outputData = MutableData()
         let completionBox = CompletionBox(completion: completion)
+        let logBox = LogBox(log)
 
         outputHandle.readabilityHandler = { [weak self] handle in
             let data = handle.availableData
@@ -88,9 +111,12 @@ final class FFmpegService: ObservableObject, @unchecked Sendable {
             let output = String(data: outputData.data, encoding: .utf8) ?? ""
 
             if exitCode == 0 {
+                logBox.call("✅ Completed: \(fileName) -> \(outputURL.lastPathComponent)")
                 self?.advanceProgress()
                 completionBox.complete(.success(outputURL))
             } else {
+                logBox.call("❌ Failed: \(fileName) — exit code \(exitCode)")
+                if !output.isEmpty { logBox.call("   FFmpeg output: \(output)") }
                 let error = FFmpegError.conversionFailed(
                     FileManager.default.fileExists(atPath: outputURL.path) ? nil : output
                 )
@@ -110,6 +136,7 @@ final class FFmpegService: ObservableObject, @unchecked Sendable {
         do {
             try process.run()
         } catch {
+            logBox.call("❌ Failed to launch ffmpeg for \(fileName): \(error.localizedDescription)")
             lock.lock()
             activeProcesses.removeValue(forKey: fileId)
             isProcessing = activeProcesses.isEmpty

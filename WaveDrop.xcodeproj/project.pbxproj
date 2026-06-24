@@ -24,7 +24,8 @@
 		C9432494457F49D2309EFF73 /* WaveDropApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8337A2B7E0909B746EA18428 /* WaveDropApp.swift */; };
 		CC5099BF4B1FAD6474FF3A68 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB21AC1907C5DA75E787110 /* main.swift */; };
 		F5398119174E5C73617BCF9C /* AudioMetadataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7688AB6BB533933BAF85CAE6 /* AudioMetadataService.swift */; };
-		FFE06C4B8F2F3A669B048965 /* ConverterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77858EDFCDDCF8F77EB0DD44 /* ConverterViewModel.swift */; };
+			FFE06C4B8F2F3A669B048965 /* ConverterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77858EDFCDDCF8F77EB0DD44 /* ConverterViewModel.swift */; };
+			AABB0001LOGVIEWBUILD /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB0002LOGVIEWREF /* LogView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +47,8 @@
 		CCAE126E3BC14DA4C3405EFE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		DB86AB35E0D46FA85431B024 /* ConversionProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversionProgressView.swift; sourceTree = "<group>"; };
 		DD5055FA3B64842AB6D459AD /* FileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileService.swift; sourceTree = "<group>"; };
-		FCB21AC1907C5DA75E787110 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+			FCB21AC1907C5DA75E787110 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+			AABB0002LOGVIEWREF /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -127,7 +129,8 @@
 				1D886F5FB91A8363890B0057 /* FolderPicker.swift */,
 				CCAE126E3BC14DA4C3405EFE /* SettingsView.swift */,
 				973317A3422D2AC87A5967F3 /* ToastView.swift */,
-			);
+					AABB0002LOGVIEWREF /* LogView.swift */,
+				);
 			path = Views;
 			sourceTree = "<group>";
 		};
@@ -214,8 +217,9 @@
 				AB790A3798317B5C1CE322CE /* SettingsView.swift in Sources */,
 				AAA0C3DB0EDC744A55B090E9 /* ToastView.swift in Sources */,
 				C9432494457F49D2309EFF73 /* WaveDropApp.swift in Sources */,
-				CC5099BF4B1FAD6474FF3A68 /* main.swift in Sources */,
-			);
+					CC5099BF4B1FAD6474FF3A68 /* main.swift in Sources */,
+					AABB0001LOGVIEWBUILD /* LogView.swift in Sources */,
+				);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

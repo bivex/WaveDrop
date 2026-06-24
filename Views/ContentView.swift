@@ -2,11 +2,17 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var viewModel: ConverterViewModel
+    @State private var showLog = false
 
     var body: some View {
         VStack(spacing: 0) {
             headerView
                 .padding()
+
+            if showLog {
+                LogView(logText: viewModel.logText)
+                    .frame(maxHeight: 200)
+            }
 
             if viewModel.audioFiles.isEmpty {
                 DropZoneView { urls in
@@ -86,6 +92,24 @@ struct ContentView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Add files")
+
+                Button {
+                    withAnimation { showLog.toggle() }
+                } label: {
+                    Image(systemName: showLog ? "text.append" : "text.alignleft")
+                }
+                .buttonStyle(.borderless)
+                .help("Toggle log")
+            }
+
+            if viewModel.audioFiles.isEmpty {
+                Button {
+                    withAnimation { showLog.toggle() }
+                } label: {
+                    Image(systemName: showLog ? "text.append" : "text.alignleft")
+                }
+                .buttonStyle(.borderless)
+                .help("Toggle log")
             }
         }
     }
